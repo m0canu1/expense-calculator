@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Expense Calculator</title>
+  </head>
+  <body>
+    <h1>Expense Calculator</h1>
+    <form id="form">
+      <label for="num-people">Number of people:</label>
+      <input type="number" id="num-people" name="num-people"><br>
+      <div id="inputs"></div>
+      <button type="submit">Calculate</button>
+    </form>
+    <div id="results"></div>
+  </body>
+  <script>
+    const form = document.getElementById("form");
+    const inputs = document.getElementById("inputs");
+    const numPeopleInput = document.getElementById("num-people");
+    const results = document.getElementById("results");
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      // Get the number of people
+      const numPeople = parseInt(numPeopleInput.value, 10);
+
+      // Get the names and amounts spent by each person
+      const amountsSpent = {};
+      for (let i = 0; i < numPeople; i++) {
+        const nameInput = document.getElementById(`name-${i}`);
+        const amountInput = document.getElementById(`amount-${i}`);
+        amountsSpent[nameInput.value] = parseFloat(amountInput.value);
+      }
+
+      // Calculate the total amount spent
+      let totalAmount = 0;
+      for (const amount of Object.values(amountsSpent)) {
+        totalAmount += amount;
+      }
+
+      // Calculate the average amount spent per person
+      const averageAmount = totalAmount / numPeople;
+
+      // Initialize a dictionary to store the amounts that each person needs to pay or receive
+      const payments = {};
+
+      // Calculate the amount that each person needs to pay or receive
+      for (const [name, amount] of Object.entries(amountsSpent)) {
+        const difference = amount - averageAmount;
+        if (difference > 0) {
+          payments[name] = -difference;
+        } else if (difference < 0) {
+          payments[name] = Math.abs(difference);
+        }
+      }
+
+      // Clear the results
+      results.innerHTML = "";
+
+      // Print the name and amount that each person needs to pay or receive
+      for (const [name, amount] of Object.entries(payments)) {
+        if (amount > 0) {
+          results.innerHTML += `${name} needs to receive $${amount.toFixed(2)}<br>`;
